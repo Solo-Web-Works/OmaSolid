@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "ksolomon.omasolid",
+  "name": "OmASolid",
+  "version": "0.1.0",
+  "author": "ksolomon",
+  "license": "MIT",
+  "description": "Track time on a self-hosted SolidTime instance: start and stop running timers, pick clients and projects, view today's entries.",
+  "kinds": [
+    "service",
+    "bar-widget"
+  ],
+  "keepLoaded": true,
+  "entryPoints": {
+    "service": "Service.qml",
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "SolidTime",
+    "description": "SolidTime time tracker: running timer, client/project picker, today's entries",
+    "category": "Productivity",
+    "allowMultiple": false,
+    "defaultSection": "right"
+  }
+}
