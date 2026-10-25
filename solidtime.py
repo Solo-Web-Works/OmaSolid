@@ -473,6 +473,41 @@ def cmd_today(_args: argparse.Namespace) -> Dict[str, Any]:
     return {"entries": entries, "total_seconds": total, "total": _fmt_duration(total)}
 
 
+def cmd_create_project(args: argparse.Namespace) -> Dict[str, Any]:
+    config = _require_configured()
+    payload = _parse_json_arg(args.payload, "project payload")
+    name = str(payload.get("name") or "").strip()
+    client_id = str(payload.get("client_id") or "").strip() or None
+    color = str(payload.get("color") or "").strip() or "#3498db"
+    is_billable = bool(payload.get("is_billable", True))
+
+    if not name:
+        raise ApiError("Project name is required")
+
+    body = {
+        "name": name,
+        "color": color,
+        "client_id": client_id,
+        "is_billable": is_billable,
+    }
+    created = _post(config, "/organizations/%s/projects" % config["organization_id"], body)
+    item = created.get("data") or {}
+
+    client_name = ""
+    if client_id:
+        try:
+            clients_raw = _get(config, "/organizations/%s/clients" % config["organization_id"], query={"archived": "false"})
+            for c in (clients_raw.get("data") or []):
+                if str(c.get("id")) == str(client_id):
+                    client_name = str(c.get("name") or "")
+                    break
+        except ApiError:
+            pass
+
+    project = _project_from_api(item, client_name)
+    return {"project": project}
+
+
 # --------------------------------------------------------------------------- #
 # Plumbing
 # --------------------------------------------------------------------------- #
@@ -506,7 +541,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser(prog="omasolid", description="SolidTime helper for Omarchy")
     parser.add_argument("command", choices=[
         "init", "config", "save-config", "test-config", "memberships",
-        "projects", "active", "start", "stop", "today",
+        "projects", "active", "start", "stop", "today", "create-project",
     ])
     parser.add_argument("payload", nargs="?", default="")
     args = parser.parse_args(argv)
@@ -522,6 +557,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         "start": cmd_start,
         "stop": cmd_stop,
         "today": cmd_today,
+        "create-project": cmd_create_project,
     }
     handler = handlers[args.command]
 

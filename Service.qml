@@ -180,6 +180,22 @@ Item {
     })
   }
 
+  function createProject(name, clientId, done) {
+    runForeground(["create-project", JSON.stringify({
+      name: name, client_id: clientId || ""
+    })], function(result) {
+      if (!result.ok) { root.lastError = result.error; if (done) done(false, result); return }
+      var newProj = result.project
+      if (newProj && newProj.id) {
+        var list = root.projects.slice()
+        list.push(newProj)
+        root.projects = list
+      }
+      root.loadProjects()
+      if (done) done(true, result)
+    })
+  }
+
   function stopActive(done) {
     runForeground(["stop"], function(result) {
       if (!result.ok) { root.lastError = result.error; if (done) done(false, result); return }

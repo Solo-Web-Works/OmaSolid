@@ -68,3 +68,9 @@ test("malformed payload produces a structured error", () => {
   assert.equal(r._ok, false);
   assert.ok(r.error);
 });
+
+test("create-project without config returns a structured error", () => {
+  const r = run(["create-project", JSON.stringify({ name: "New Project" })]);
+  assert.equal(r._ok, false);
+  assert.ok(r.error);
+});

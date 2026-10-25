@@ -23,6 +23,8 @@ Panel {
   property string draftProject: ""
   property string draftTask: ""
   property string draftDescription: ""
+  property bool creatingProject: false
+  property string draftNewProjectName: ""
 
   // Draft settings for the "configure" form (kept locally until Save).
   property string draftInstance: ""
@@ -112,6 +114,21 @@ Panel {
 
   function stopTimer() {
     if (svc) svc.stopActive()
+  }
+
+  function canCreateProject() {
+    return root.draftNewProjectName.trim() !== "" && svc && !svc.busy
+  }
+
+  function createNewProject() {
+    if (!root.canCreateProject()) return
+    svc.createProject(root.draftNewProjectName, root.draftClient, function(ok, result) {
+      if (ok && result.project && result.project.id) {
+        root.draftProject = result.project.id
+        root.draftNewProjectName = ""
+        root.creatingProject = false
+      }
+    })
   }
 
   onOpenedChanged: {
@@ -445,6 +462,83 @@ Panel {
                 onChanged: {
                   root.draftProject = value
                   root.draftTask = ""
+                }
+              }
+
+              Button {
+                visible: !root.creatingProject
+                width: parent.width
+                text: "+ Create new project"
+                focusable: true
+                bordered: true
+                foreground: root.contentForeground
+                fontFamily: root.contentFontFamily
+                onClicked: {
+                  root.creatingProject = true
+                  root.draftNewProjectName = ""
+                }
+              }
+
+              Column {
+                width: parent.width
+                spacing: Style.space(8)
+                visible: root.creatingProject
+
+                PanelSectionHeader {
+                  width: parent.width
+                  text: "NEW PROJECT"
+                  foreground: root.contentForeground
+                  font.family: root.contentFontFamily
+                }
+
+                TextField {
+                  id: newProjectNameField
+                  width: parent.width
+                  placeholderText: "Project name"
+                  text: root.draftNewProjectName
+                  foreground: root.contentForeground
+                  font.family: root.contentFontFamily
+                  onTextChanged: root.draftNewProjectName = text
+                  onAccepted: if (root.canCreateProject()) root.createNewProject()
+                }
+
+                Text {
+                  width: parent.width
+                  text: root.draftClient ? "Will be added under selected client" : "No client selected (unassigned)"
+                  color: Util.alpha(root.contentForeground, 0.64)
+                  font.family: root.contentFontFamily
+                  font.pixelSize: Style.font.caption
+                }
+
+                Row {
+                  width: parent.width
+                  spacing: Style.space(8)
+
+                  Button {
+                    width: (parent.width - Style.space(8)) / 2
+                    text: svc && svc.busy ? "Creating…" : "Create project"
+                    enabled: root.canCreateProject()
+                    focusable: true
+                    bordered: true
+                    foreground: root.contentForeground
+                    fontFamily: root.contentFontFamily
+                    iconText: svc && svc.busy ? "󰲄" : "󰐕"
+                    iconSpinning: svc && svc.busy
+                    onClicked: root.createNewProject()
+                  }
+
+                  Button {
+                    width: (parent.width - Style.space(8)) / 2
+                    text: "Cancel"
+                    focusable: true
+                    bordered: true
+                    foreground: root.contentForeground
+                    fontFamily: root.contentFontFamily
+                    onClicked: {
+                      root.creatingProject = false
+                      root.draftNewProjectName = ""
+                    }
+                  }
                 }
               }
 
