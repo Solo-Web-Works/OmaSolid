@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "id": "ksolomon.omasolid",
-  "name": "OmASolid",
+  "name": "OmaSolid",
   "version": "0.1.0",
-  "author": "ksolomon",
+  "author": "Keith Solomon",
   "license": "MIT",
   "description": "Track time on a self-hosted SolidTime instance: start and stop running timers, pick clients and projects, view today's entries.",
   "kinds": [
