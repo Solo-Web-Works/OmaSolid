@@ -36,7 +36,7 @@ The configuration is persisted to `~/.config/omarchy/solidtime.json` with `0600`
 
 ### Creating an API token
 
-In SolidTime, generate a personal API token from **Profile Settings → Create API Token** and copy it. The token is only shown once. For self-hosted instances you may first need to create an OAuth client for user API tokens — see the SolidTime self-hosting guide.
+In SolidTime, generate a personal API token from **Profile Settings → Create API Token** and copy it. The token is only shown once. For self-hosted instances you may first need to create an OAuth client for user API tokens — see the [SolidTime self-hosting guide](https://docs.solidtime.io/self-hosting/guides/docker) step 11.
 
 ## How it works
 
