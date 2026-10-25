@@ -1,10 +1,10 @@
-# OmASolid
+# OmaSolid
 
 Track time on a self-hosted [SolidTime](https://github.com/solidtime-io/solidtime) instance from the Omarchy bar.
 
-![OmASolid in the Omarchy bar](preview.png)
+![OmaSolid in the Omarchy bar](preview.png)
 
-OmASolid adds a single bar widget that opens a panel for:
+OmaSolid adds a single bar widget that opens a panel for:
 
 - **Running timer** — start a running timer with a client, project, optional task, and a note; stop it with one click. The bar icon shows the live elapsed clock while a timer runs, and the panel keeps ticking in the background.
 - **Client + project picker** — clients and projects are pulled live from your SolidTime instance. Pick a client to filter its projects, then pick a project. Tasks are offered when the instance exposes them.
@@ -16,7 +16,7 @@ Right-click the bar icon to stop a running timer without opening the panel.
 ## Install
 
 ```sh
-omarchy plugin add https://github.com/ksolomon/omasolid.git --enable
+omarchy plugin add https://github.com/Solo-Web-Works/OmaSolid --enable
 omarchy restart shell
 ```
 
