@@ -2,7 +2,7 @@
 
 Track time on a self-hosted [SolidTime](https://github.com/solidtime-io/solidtime) instance from the Omarchy bar.
 
-![OmaSolid in the Omarchy bar](preview.png)
+![OmaSolid panel](preview.png)
 
 OmaSolid adds a single bar widget that opens a panel for:
 
