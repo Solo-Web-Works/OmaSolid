@@ -40,7 +40,7 @@ In SolidTime, generate a personal API token from **Profile Settings → Create A
 
 ## How it works
 
-The plugin follows the standard Omarchy plugin shape: a `Service.qml` coordinates a small Python helper (`solidtime.py`) over `Process`, and the helper does all HTTP against the SolidTime REST API using only the Python standard library — no pip dependencies. The bar widget and panel read state from the service. The live elapsed timer ticks inside QML and resyncs from the API every minute so it stays accurate even after the panel closes.
+The plugin follows the standard Omarchy plugin shape: a `Service.qml` coordinates a small Python helper (`solidtime.py`) over `Process`, and the helper does all HTTP against the SolidTime REST API using only the Python standard library — no pip dependencies. JSON payloads, including credentials and timer descriptions, are sent to the helper over stdin rather than process arguments. The bar widget and panel read state from the service. The live elapsed timer ticks inside QML and resyncs from the API every minute so it stays accurate even after the panel closes.
 
 The helper stores config at `~/.config/omarchy/solidtime.json` and exposes these subcommands to the service: `init`, `save-config`, `test-config`, `memberships`, `projects`, `active`, `start`, `stop`, and `today`.
 

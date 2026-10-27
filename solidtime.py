@@ -17,15 +17,16 @@ Config file shape:
 Subcommands (each prints a JSON object on stdout, exit 0 on success):
     init                       -> {"configured": bool, ...config fields}
     config                     -> same as init (current persisted config)
-    save-config <json>         -> writes config, prints saved config
-    test-config <json>         -> validates without saving; prints user+orgs
+    save-config                -> reads config JSON from stdin, writes it, prints saved config
+    test-config                -> reads config JSON from stdin, validates without saving
     memberships               -> {user, organizations: [{id, name, is_personal, role, member_id}]}
     projects                   -> {clients: [...], projects: [...], tasks: [...]},
                                  grouped by client; projects include client_id
     active                     -> {active: bool, entry: {...}|null}
-    start <json>               -> {entry: {...}}  (starts a running timer)
+    start                      -> reads timer JSON from stdin, starts a running timer
     stop                       -> {entry: {...}|null}  (stops the active timer)
     today                      -> {entries: [...], total_seconds: int}
+    create-project             -> reads project JSON from stdin, creates a project
 
 All timestamps exchanged with the API are UTC, formatted as
 "YYYY-MM-DDTHH:MM:SSZ". Durations reported back to QML are integer seconds.
@@ -302,7 +303,7 @@ def cmd_config(_args: argparse.Namespace) -> Dict[str, Any]:
 
 
 def cmd_save_config(args: argparse.Namespace) -> Dict[str, Any]:
-    payload = _parse_json_arg(args.payload, "config payload")
+    payload = _parse_json_payload("config payload")
     config = _default_config()
     for key in ("instance", "token", "organization_id", "member_id"):
         if key in payload:
@@ -312,7 +313,7 @@ def cmd_save_config(args: argparse.Namespace) -> Dict[str, Any]:
 
 
 def cmd_test_config(args: argparse.Namespace) -> Dict[str, Any]:
-    payload = _parse_json_arg(args.payload, "config payload")
+    payload = _parse_json_payload("config payload")
     candidate = _default_config()
     for key in ("instance", "token", "organization_id", "member_id"):
         if key in payload:
@@ -401,7 +402,7 @@ def cmd_active(_args: argparse.Namespace) -> Dict[str, Any]:
 
 def cmd_start(args: argparse.Namespace) -> Dict[str, Any]:
     config = _require_configured()
-    payload = _parse_json_arg(args.payload, "time entry payload")
+    payload = _parse_json_payload("time entry payload")
     project_id = str(payload.get("project_id") or "")
     task_id = str(payload.get("task_id") or "") or None
     description = str(payload.get("description") or "")
@@ -475,7 +476,7 @@ def cmd_today(_args: argparse.Namespace) -> Dict[str, Any]:
 
 def cmd_create_project(args: argparse.Namespace) -> Dict[str, Any]:
     config = _require_configured()
-    payload = _parse_json_arg(args.payload, "project payload")
+    payload = _parse_json_payload("project payload")
     name = str(payload.get("name") or "").strip()
     client_id = str(payload.get("client_id") or "").strip() or None
     color = str(payload.get("color") or "").strip() or "#3498db"
@@ -519,8 +520,9 @@ def _require_configured() -> Dict[str, Any]:
     return config
 
 
-def _parse_json_arg(value: str, label: str) -> Dict[str, Any]:
-    if not value:
+def _parse_json_payload(label: str) -> Dict[str, Any]:
+    value = sys.stdin.readline()
+    if not value.strip():
         raise ApiError("Missing %s" % label)
     try:
         parsed = json.loads(value)
@@ -543,7 +545,6 @@ def main(argv: Optional[List[str]] = None) -> int:
         "init", "config", "save-config", "test-config", "memberships",
         "projects", "active", "start", "stop", "today", "create-project",
     ])
-    parser.add_argument("payload", nargs="?", default="")
     args = parser.parse_args(argv)
 
     handlers = {

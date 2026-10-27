@@ -51,17 +51,22 @@ Item {
     // future cross-plugin lookups keep working.
   }
 
-  function runHelper(args, onResult, foreground) {
-    var job = { args: args, onResult: onResult, foreground: !!foreground }
+  function runHelper(args, onResult, foreground, payload) {
+    var job = {
+      args: args,
+      payload: payload || "",
+      onResult: onResult,
+      foreground: !!foreground
+    }
     root._queue.push(job)
     root.pumpQueue()
   }
 
   // Run a call the user initiated. Sets the busy flag so the panel buttons
   // show a spinner and block re-entry.
-  function runForeground(args, onResult) {
+  function runForeground(args, onResult, payload) {
     root.busy = true
-    runHelper(args, onResult, true)
+    runHelper(args, onResult, true, payload)
   }
 
   // Run a background call (polls, refreshes) that must not block the UI.
@@ -110,16 +115,16 @@ Item {
   // that cannot authenticate. On success the caller chooses an org and calls
   // saveConfig.
   function testConfig(candidate, done) {
-    runForeground(["test-config", JSON.stringify(candidate)], function(result) {
+    runForeground(["test-config"], function(result) {
       if (!result.ok) { root.lastError = result.error; if (done) done(false, result); return }
       root.user = result.user || {}
       root.organizations = result.organizations || []
       if (done) done(true, result)
-    })
+    }, JSON.stringify(candidate))
   }
 
   function saveConfig(candidate, done) {
-    runForeground(["save-config", JSON.stringify(candidate)], function(result) {
+    runForeground(["save-config"], function(result) {
       if (!result.ok) { root.lastError = result.error; if (done) done(false, result); return }
       root.config = {
         instance: result.instance || candidate.instance || "",
@@ -129,7 +134,7 @@ Item {
       }
       if (done) done(true, result)
       if (root.configured) root.refreshAll()
-    })
+    }, JSON.stringify(candidate))
   }
 
   // --- API: data ----------------------------------------------------------- #
@@ -169,21 +174,19 @@ Item {
   // --- API: actions -------------------------------------------------------- #
 
   function startEntry(projectId, taskId, description, done) {
-    runForeground(["start", JSON.stringify({
-      project_id: projectId, task_id: taskId || "", description: description || ""
-    })], function(result) {
+    runForeground(["start"], function(result) {
       if (!result.ok) { root.lastError = result.error; if (done) done(false, result); return }
       root.activeEntry = result.entry || null
       root.syncElapsed()
       root.loadToday()
       if (done) done(true, result)
-    })
+    }, JSON.stringify({
+      project_id: projectId, task_id: taskId || "", description: description || ""
+    }))
   }
 
   function createProject(name, clientId, done) {
-    runForeground(["create-project", JSON.stringify({
-      name: name, client_id: clientId || ""
-    })], function(result) {
+    runForeground(["create-project"], function(result) {
       if (!result.ok) { root.lastError = result.error; if (done) done(false, result); return }
       var newProj = result.project
       if (newProj && newProj.id) {
@@ -193,7 +196,9 @@ Item {
       }
       root.loadProjects()
       if (done) done(true, result)
-    })
+    }, JSON.stringify({
+      name: name, client_id: clientId || ""
+    }))
   }
 
   function stopActive(done) {
@@ -263,7 +268,12 @@ Item {
 
   Process {
     id: helperProcess
+    stdinEnabled: true
     property var callback: null
+    onStarted: {
+      if (helperProcess.callback && helperProcess.callback.payload)
+        helperProcess.write(helperProcess.callback.payload + "\n")
+    }
     stdout: StdioCollector {
       waitForEnd: true
       onStreamFinished: {
