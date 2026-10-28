@@ -215,6 +215,7 @@ Panel {
 
               Text {
                 text: root.statusSubtitle()
+                textFormat: Text.PlainText
                 color: Util.alpha(root.contentForeground, 0.64)
                 font.family: root.contentFontFamily
                 font.pixelSize: Style.font.caption
@@ -337,6 +338,7 @@ Panel {
               visible: svc && svc.user && svc.user.name !== ""
               width: parent.width
               text: "Signed in as " + (svc.user.name || "") + (svc.user.email ? " (" + svc.user.email + ")" : "")
+              textFormat: Text.PlainText
               color: Util.alpha(root.contentForeground, 0.64)
               font.family: root.contentFontFamily
               font.pixelSize: Style.font.caption
@@ -376,6 +378,7 @@ Panel {
                   Text {
                     text: svc && svc.activeEntry && svc.activeEntry.project_name
                       ? svc.activeEntry.project_name : "Active timer"
+                    textFormat: Text.PlainText
                     color: root.contentForeground
                     font.family: root.contentFontFamily
                     font.pixelSize: Style.font.body
@@ -388,6 +391,7 @@ Panel {
                     text: (svc.activeEntry && svc.activeEntry.description
                       ? svc.activeEntry.description + " · " : "")
                       + (svc ? svc.elapsedLabel : "")
+                    textFormat: Text.PlainText
                     color: Util.alpha(root.contentForeground, 0.64)
                     font.family: root.contentFontFamily
                     font.pixelSize: Style.font.caption
@@ -654,6 +658,7 @@ Panel {
                       width: parent.width - durationText.width - Style.space(8)
                       text: (modelData.project_name ? modelData.project_name + " — " : "")
                         + (modelData.description && modelData.description !== "" ? modelData.description : "No description")
+                      textFormat: Text.PlainText
                       color: root.contentForeground
                       font.family: root.contentFontFamily
                       font.pixelSize: Style.font.bodySmall
@@ -768,6 +773,7 @@ Panel {
             visible: svc && svc.lastError !== ""
             width: parent.width
             text: svc ? svc.lastError : ""
+            textFormat: Text.PlainText
             color: Color.urgent
             font.family: root.contentFontFamily
             font.pixelSize: Style.font.caption

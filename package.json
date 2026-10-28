@@ -4,7 +4,7 @@
   "private": true,
   "description": "Track time on a self-hosted SolidTime instance from the Omarchy bar.",
   "scripts": {
-    "test": "node --test test/test_model.mjs test/test_helper.mjs"
+    "test": "node --test test/test_model.mjs test/test_helper.mjs test/test_rendering.mjs"
   },
   "license": "MIT"
 }

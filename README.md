@@ -44,6 +44,8 @@ The plugin follows the standard Omarchy plugin shape: a `Service.qml` coordinate
 
 The helper stores config at `~/.config/omarchy/solidtime.json` and exposes these subcommands to the service: `init`, `save-config`, `test-config`, `memberships`, `projects`, `active`, `start`, `stop`, and `today`.
 
+API-supplied panel labels (including project names, descriptions, account details, and errors) render as plain text, never as HTML or inline images. Bar tooltips show only generic status; open the panel for project and error details because the host controls tooltip rendering.
+
 ## Requirements
 
 - Omarchy (Quattro or later)
@@ -51,6 +53,8 @@ The helper stores config at `~/.config/omarchy/solidtime.json` and exposes these
 - A reachable self-hosted SolidTime instance with an API token
 
 ## Validate
+
+Run `npm test` for helper, model, and rendering regressions. The rendering test uses `qml6` (or `QML_BIN`) with an offscreen Qt backend and a loopback HTTP listener: an AutoText control must request an injected image, while the panel's plain-text formats must not. Without a Qt runtime, only the live rendering test is skipped; source guards still run.
 
 ```sh
 omarchy plugin validate .

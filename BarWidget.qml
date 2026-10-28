@@ -81,11 +81,9 @@ BarWidget {
     }
     tooltipText: {
       var svc = root.omasolidService
-      if (svc && svc.lastError) return "SolidTime: " + svc.lastError
-      if (svc && svc.active) {
-        var name = svc.activeEntry && svc.activeEntry.project_name ? svc.activeEntry.project_name : "timer"
-        return "SolidTime running on " + name + " — " + svc.elapsedLabel
-      }
+      // The host tooltip's text format is outside this plugin's control.
+      if (svc && svc.lastError) return "SolidTime: error — open for details"
+      if (svc && svc.active) return "SolidTime: timer running"
       if (svc && svc.configured) return "SolidTime: no timer running"
       return "SolidTime not configured"
     }
